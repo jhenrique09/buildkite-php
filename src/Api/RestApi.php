@@ -22,10 +22,11 @@ use bbaga\BuildkiteApi\Api\Rest\PipelineInterface;
 use bbaga\BuildkiteApi\Api\Rest\User;
 use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\ResponseInterface;
-use function GuzzleHttp\Psr7\stream_for;
+use Psr\Http\Message\StreamFactoryInterface;
 
 final class RestApi extends AbstractApi implements RestApiInterface
 {
+
     public const BASE_URI = 'https://api.buildkite.com/v2/';
 
     public function get(string $resource, array $options = []): ResponseInterface
@@ -56,7 +57,7 @@ final class RestApi extends AbstractApi implements RestApiInterface
     {
         $options = count($body) === 0 ? JSON_FORCE_OBJECT : 0;
         $request = (new Request('POST', sprintf('%s%s', $this->uri, $resource)))
-            ->withBody(stream_for(json_encode($body, $options)));
+            ->withBody($this->streamFactory->createStream(json_encode($body, $options)));
 
         return $this->client->sendRequest($this->addHeaders($request));
     }
@@ -65,7 +66,7 @@ final class RestApi extends AbstractApi implements RestApiInterface
     {
         $options = count($body) === 0 ? JSON_FORCE_OBJECT : 0;
         $request = (new Request('PATCH', sprintf('%s%s', $this->uri, $resource)))
-            ->withBody(stream_for(json_encode($body, $options)));
+            ->withBody($this->streamFactory->createStream(json_encode($body, $options)));
 
         return $this->client->sendRequest($this->addHeaders($request));
     }
@@ -74,7 +75,7 @@ final class RestApi extends AbstractApi implements RestApiInterface
     {
         $options = count($body) === 0 ? JSON_FORCE_OBJECT : 0;
         $request = (new Request('PUT', sprintf('%s%s', $this->uri, $resource)))
-            ->withBody(stream_for(json_encode($body, $options)));
+            ->withBody($this->streamFactory->createStream(json_encode($body, $options)));
 
         return $this->client->sendRequest($this->addHeaders($request));
     }

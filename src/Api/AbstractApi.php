@@ -7,6 +7,8 @@ namespace bbaga\BuildkiteApi\Api;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Http\Discovery\Psr17FactoryDiscovery;
+use Psr\Http\Message\StreamFactoryInterface;
 use function is_array;
 
 class AbstractApi
@@ -28,16 +30,19 @@ class AbstractApi
      */
     protected $uri;
 
+    protected StreamFactoryInterface $streamFactory;
+
     /**
      * @param ClientInterface $client
      * @param string $accessToken Buildkite API Access Token
      * @param string $uri Buildkite API uri
      */
-    public function __construct(ClientInterface $client, string $accessToken, string $uri = null)
+    public function __construct(ClientInterface $client, string $accessToken, string $uri = null, StreamFactoryInterface $streamFactory = null)
     {
         $this->client = $client;
         $this->accessToken = $accessToken;
         $this->uri = $uri ?? (string) static::BASE_URI;
+        $this->streamFactory = $streamFactory ?: Psr17FactoryDiscovery::findStreamFactory();
     }
 
     public function getResponseBody(ResponseInterface $response): array

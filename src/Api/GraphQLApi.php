@@ -6,7 +6,6 @@ namespace bbaga\BuildkiteApi\Api;
 
 use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\ResponseInterface;
-use function GuzzleHttp\Psr7\stream_for;
 
 final class GraphQLApi extends AbstractApi implements GraphQLApiInterface
 {
@@ -15,7 +14,7 @@ final class GraphQLApi extends AbstractApi implements GraphQLApiInterface
     public function post(string $query = '{}', string $variables = '{}'): ResponseInterface
     {
         $request = (new Request('POST', $this->uri))
-            ->withBody(stream_for(json_encode(['query' => $query, 'variables' => $variables])));
+            ->withBody($this->streamFactory->createStream(json_encode(['query' => $query, 'variables' => $variables])));
 
         return $this->client->sendRequest($this->addHeaders($request));
     }
